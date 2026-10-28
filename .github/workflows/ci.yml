@@ -1,0 +1,34 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "${{ matrix.python }}" }
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - name: search-quality gate (keyword search, no model download)
+        run: rekollect eval --modes lexical --bench devshell --fail-under hit1=0.78 --no-save
+      - name: bash hook parses
+        if: runner.os != 'Windows'
+        run: bash -n <(rekollect hook bash)
+      - name: PowerShell hook parses (pwsh)
+        shell: pwsh
+        run: |
+          $errs = $null
+          [System.Management.Automation.Language.Parser]::ParseInput((rekollect hook powershell | Out-String), [ref]$null, [ref]$errs) | Out-Null
+          if ($errs) { $errs; exit 1 }
+      - name: PowerShell hook parses (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $errs = $null
+          [System.Management.Automation.Language.Parser]::ParseInput((rekollect hook powershell | Out-String), [ref]$null, [ref]$errs) | Out-Null
+          if ($errs) { $errs; exit 1 }

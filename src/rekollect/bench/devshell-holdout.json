@@ -1,0 +1,607 @@
+{
+ "name": "devshell-holdout",
+ "version": 1,
+ "description": "Held-out questions over the same history. Written before any tuning and never used to choose hints or weights, so it shows whether improvements generalise.",
+ "commands": [
+  "git status",
+  "git add -A",
+  "git commit -m \"fix login redirect\"",
+  "git commit --amend --no-edit",
+  "git reset --soft HEAD~1",
+  "git reset --hard HEAD~1",
+  "git reset HEAD -- src/app.py",
+  "git restore --staged .",
+  "git checkout -- src/config.yaml",
+  "git stash push -m \"wip auth\"",
+  "git stash pop",
+  "git stash list",
+  "git log --oneline --graph --decorate -20",
+  "git log -p --follow -- src/billing.py",
+  "git blame -L 40,80 src/billing.py",
+  "git diff --stat main...HEAD",
+  "git diff --cached",
+  "git branch -d feature/old-ui",
+  "git push origin --delete feature/old-ui",
+  "git fetch --prune",
+  "git rebase -i HEAD~5",
+  "git cherry-pick 4f2a9c1",
+  "git revert 3f9c2ab",
+  "git clean -fdx",
+  "git tag -a v2.3.0 -m \"release 2.3.0\"",
+  "git push --follow-tags",
+  "git bisect start HEAD v2.2.0",
+  "git reflog",
+  "git remote set-url origin git@github.com:acme/api.git",
+  "git worktree add ../api-hotfix hotfix/2.3.1",
+  "git submodule update --init --recursive",
+  "git config --global user.email \"dev@acme.io\"",
+  "gh pr create --fill --draft",
+  "gh pr checkout 482",
+  "gh run watch",
+  "docker ps -a",
+  "docker build -t api:latest .",
+  "docker build --no-cache -t api:latest .",
+  "docker compose up -d --build",
+  "docker compose down -v",
+  "docker compose logs -f web",
+  "docker exec -it api_web_1 bash",
+  "docker system prune -af --volumes",
+  "docker image prune -f",
+  "docker volume ls",
+  "docker stats --no-stream",
+  "docker inspect -f '{{.NetworkSettings.IPAddress}}' api_web_1",
+  "docker cp api_web_1:/app/logs/error.log ./error.log",
+  "docker run --rm -it -p 5432:5432 -e POSTGRES_PASSWORD=dev postgres:16",
+  "docker login ghcr.io -u acme-bot",
+  "docker tag api:latest ghcr.io/acme/api:2.3.0",
+  "docker push ghcr.io/acme/api:2.3.0",
+  "docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/acme/api:2.3.0 --push .",
+  "kubectl get pods -n prod",
+  "kubectl get pods -A -o wide",
+  "kubectl describe pod api-7d9f8b-xk2lp -n prod",
+  "kubectl logs -f deploy/api -n prod",
+  "kubectl logs deploy/api -n prod --since=24h > api-deploy.log",
+  "kubectl logs api-7d9f8b-xk2lp -n prod --previous",
+  "kubectl rollout restart deploy/api -n prod",
+  "kubectl rollout undo deploy/api -n prod",
+  "kubectl rollout status deploy/api -n prod",
+  "kubectl scale deploy/api --replicas=5 -n prod",
+  "kubectl port-forward svc/postgres 5432:5432 -n prod",
+  "kubectl exec -it api-7d9f8b-xk2lp -n prod -- sh",
+  "kubectl apply -f k8s/",
+  "kubectl delete pod api-7d9f8b-xk2lp -n prod",
+  "kubectl config use-context prod-eu",
+  "kubectl get events -n prod --sort-by=.lastTimestamp",
+  "kubectl top pods -n prod",
+  "kubectl get secret api-env -n prod -o jsonpath='{.data.DATABASE_URL}' | base64 -d",
+  "helm upgrade --install api ./chart -n prod -f values-prod.yaml",
+  "helm rollback api 12 -n prod",
+  "helm list -A",
+  "python -m venv .venv",
+  "source .venv/bin/activate",
+  "pip install -r requirements.txt",
+  "pip install -e \".[dev]\"",
+  "pip freeze > requirements.lock",
+  "pip list --outdated",
+  "pytest -q",
+  "pytest -x -k test_checkout -vv",
+  "pytest --cov=src --cov-report=html",
+  "pytest tests/integration -m integration",
+  "python -m pytest --lf",
+  "ruff check . --fix",
+  "black src tests",
+  "mypy src",
+  "python -m build",
+  "twine upload dist/*",
+  "uv sync",
+  "uv add httpx",
+  "python manage.py migrate",
+  "python manage.py makemigrations billing",
+  "python manage.py createsuperuser",
+  "alembic upgrade head",
+  "alembic revision --autogenerate -m \"add invoices table\"",
+  "uvicorn app.main:app --reload --port 8000",
+  "python -m http.server 8080",
+  "jupyter lab --no-browser --port 8888",
+  "npm install",
+  "npm ci",
+  "npm run dev",
+  "npm run build",
+  "npm test -- --watch",
+  "npm outdated",
+  "npm audit fix",
+  "npx prisma migrate dev --name add_orders",
+  "npx tsc --noEmit",
+  "npx eslint . --fix",
+  "rm -rf node_modules package-lock.json && npm install",
+  "nvm use 20",
+  "find . -name \"*.log\" -mtime +7 -delete",
+  "find . -type f -size +100M",
+  "find . -name node_modules -type d -prune -exec rm -rf {} +",
+  "grep -rn \"TODO\" src/",
+  "rg -l \"DATABASE_URL\"",
+  "rg \"def handle_\" --type py",
+  "sed -i 's/staging.acme.io/prod.acme.io/g' config/*.yaml",
+  "awk -F, '{print $3}' sales.csv | sort | uniq -c | sort -rn",
+  "jq '.items[].metadata.name' pods.json",
+  "cut -d: -f1 /etc/passwd",
+  "wc -l src/**/*.py",
+  "tail -f /var/log/nginx/error.log",
+  "tail -n 200 app.log | grep -i error",
+  "less +F /var/log/syslog",
+  "du -sh * | sort -hr | head -20",
+  "du -sh ~/.cache",
+  "df -h",
+  "ncdu ~",
+  "tar -czvf backup-2026-10-27.tar.gz ./data",
+  "tar -xzvf dataset.tar.gz -C ~/data",
+  "unzip -q release.zip -d release/",
+  "zip -r site.zip public/",
+  "ln -s ~/dotfiles/zshrc ~/.zshrc",
+  "chmod +x scripts/deploy.sh",
+  "chmod 600 ~/.ssh/id_ed25519",
+  "chown -R www-data:www-data /var/www/app",
+  "mkdir -p build/assets",
+  "cp -r templates/ ~/backup/templates/",
+  "mv report-final.pdf ~/Documents/reports/",
+  "rsync -avz --delete ./public/ deploy@web-1:/var/www/site/",
+  "rsync -avz --progress gpu-box:~/runs/exp42/ ./runs/exp42/",
+  "scp deploy@10.0.0.12:/var/log/app/deploy-2026-10-27.log .",
+  "scp ./dist/app.tar.gz deploy@10.0.0.12:/opt/app/",
+  "lsof -i :8000",
+  "lsof -t -i:3000 | xargs kill -9",
+  "netstat -tulpn | grep LISTEN",
+  "ss -ltnp",
+  "curl -I https://api.acme.io/health",
+  "curl -s https://api.acme.io/v1/users | jq .",
+  "curl -X POST -H \"Content-Type: application/json\" -d @payload.json http://localhost:8000/v1/orders",
+  "wget -c https://download.acme.io/models/bert-base.tar.gz",
+  "dig +short api.acme.io",
+  "nslookup acme.io 8.8.8.8",
+  "ping -c 4 10.0.0.1",
+  "traceroute api.acme.io",
+  "ssh deploy@10.0.0.12",
+  "ssh -L 8888:localhost:8888 gpu-box",
+  "ssh -i ~/.ssh/aws.pem ubuntu@ec2-3-90-1-1.compute.amazonaws.com",
+  "ssh-keygen -t ed25519 -C \"dev@acme.io\"",
+  "ssh-copy-id deploy@10.0.0.12",
+  "openssl s_client -connect api.acme.io:443 -servername api.acme.io",
+  "openssl x509 -in cert.pem -noout -dates",
+  "nc -zv db.internal 5432",
+  "sudo ufw allow 443/tcp",
+  "ps aux | grep python",
+  "kill -9 48213",
+  "pkill -f uvicorn",
+  "htop",
+  "top -o %MEM",
+  "nohup python train.py > train.log 2>&1 &",
+  "systemctl status nginx",
+  "sudo systemctl restart nginx",
+  "journalctl -u api --since \"1 hour ago\" -f",
+  "crontab -e",
+  "sudo apt update && sudo apt upgrade -y",
+  "brew upgrade && brew cleanup",
+  "uptime",
+  "free -h",
+  "nvidia-smi",
+  "watch -n 1 nvidia-smi",
+  "sudo reboot",
+  "ffmpeg -i input.mov -vcodec libx264 -crf 28 output.mp4",
+  "ffmpeg -i talk.mp4 -vn -acodec mp3 talk.mp3",
+  "ffmpeg -i clip.mp4 -ss 00:00:10 -t 5 -vf \"fps=10,scale=480:-1\" clip.gif",
+  "convert screenshot.png -resize 50% small.png",
+  "magick mogrify -format webp *.jpg",
+  "psql -h localhost -U postgres -d app",
+  "pg_dump -Fc app > app-2026-10-27.dump",
+  "pg_restore -d app_test app-2026-10-27.dump",
+  "psql -c \"SELECT pg_size_pretty(pg_database_size('app'))\"",
+  "mysql -u root -p -e \"SHOW DATABASES\"",
+  "redis-cli FLUSHALL",
+  "redis-cli --scan --pattern 'session:*' | head",
+  "sqlite3 app.db \".tables\"",
+  "terraform init",
+  "terraform plan -out tfplan",
+  "terraform apply tfplan",
+  "terraform destroy -target=aws_instance.worker",
+  "aws s3 ls s3://acme-backups/",
+  "aws s3 sync ./build s3://acme-site --delete",
+  "aws logs tail /ecs/api --since 1d --follow",
+  "aws sts get-caller-identity",
+  "aws ecr get-login-password | docker login --username AWS --password-stdin 1234.dkr.ecr.eu-west-1.amazonaws.com",
+  "gcloud auth login",
+  "gcloud config set project acme-prod",
+  "az login",
+  "Get-Process | Sort-Object CPU -Descending | Select-Object -First 10",
+  "Stop-Process -Name node -Force",
+  "Get-NetTCPConnection -LocalPort 8000 | Select-Object OwningProcess",
+  "Get-ChildItem -Recurse -Filter *.log | Remove-Item",
+  "Get-Content .\\app.log -Tail 50 -Wait",
+  "Select-String -Path .\\src\\*.py -Pattern \"TODO\"",
+  "Invoke-WebRequest https://api.acme.io/health -UseBasicParsing",
+  "Test-NetConnection db.internal -Port 5432",
+  "winget upgrade --all",
+  "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+  "Compress-Archive -Path .\\dist\\* -DestinationPath release.zip",
+  "$env:PYTHONPATH = \"src\"",
+  "Get-FileHash .\\installer.exe -Algorithm SHA256",
+  "history | grep docker",
+  "code .",
+  "tmux new -s work",
+  "tmux attach -t work",
+  "make test",
+  "make clean && make",
+  "cat ~/.ssh/config",
+  "echo $PATH | tr ':' '\\n'",
+  "export AWS_PROFILE=prod",
+  "base64 -d secret.txt",
+  "shasum -a 256 release.zip",
+  "date -u +%Y-%m-%dT%H:%M:%SZ"
+ ],
+ "queries": [
+  {
+   "q": "show the changes that are staged",
+   "expect": [
+    "git diff --cached"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "add forgotten files to my last commit",
+   "expect": [
+    "git commit --amend --no-edit"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "list my stashes",
+   "expect": [
+    "git stash list"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "history of the billing file with the actual diffs",
+   "expect": [
+    "git log -p --follow -- src/billing.py"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "compare my branch with main",
+   "expect": [
+    "git diff --stat main...HEAD"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "delete my local feature branch",
+   "expect": [
+    "git branch -d feature/old-ui"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "clean up references to deleted remote branches",
+   "expect": [
+    "git fetch --prune"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "undo a commit that is already pushed",
+   "expect": [
+    "git revert 3f9c2ab"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "pull in the submodules",
+   "expect": [
+    "git submodule update --init --recursive"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "check out a colleague's pull request",
+   "expect": [
+    "gh pr checkout 482"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "watch the CI run",
+   "expect": [
+    "gh run watch"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "list all containers including stopped ones",
+   "expect": [
+    "docker ps -a"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "find the ip address of the container",
+   "expect": [
+    "docker inspect -f '{{.NetworkSettings.IPAddress}}' api_web_1"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "authenticate to the github container registry",
+   "expect": [
+    "docker login ghcr.io -u acme-bot"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "remove dangling images",
+   "expect": [
+    "docker image prune -f"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "list pods in every namespace",
+   "expect": [
+    "kubectl get pods -A -o wide"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "why is the pod failing to start",
+   "expect": [
+    "kubectl describe pod api-7d9f8b-xk2lp -n prod"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "open a shell in the api pod",
+   "expect": [
+    "kubectl exec -it api-7d9f8b-xk2lp -n prod -- sh"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "deploy the helm chart to production",
+   "expect": [
+    "helm upgrade --install api ./chart -n prod -f values-prod.yaml"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "wait until the rollout finishes",
+   "expect": [
+    "kubectl rollout status deploy/api -n prod"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "lock the exact versions of my python packages",
+   "expect": [
+    "pip freeze > requirements.lock"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "which python packages need updating",
+   "expect": [
+    "pip list --outdated"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "run one test and stop at the first failure",
+   "expect": [
+    "pytest -x -k test_checkout -vv"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "format the python code",
+   "expect": [
+    "black src tests"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "make an admin account for django",
+   "expect": [
+    "python manage.py createsuperuser"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "start jupyter on the server",
+   "expect": [
+    "jupyter lab --no-browser --port 8888"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "fix vulnerable npm dependencies",
+   "expect": [
+    "npm audit fix"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "switch to node 20",
+   "expect": [
+    "nvm use 20"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "search the source for TODO comments",
+   "expect": [
+    "grep -rn \"TODO\" src/",
+    "Select-String -Path .\\src\\*.py -Pattern \"TODO\""
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "which files mention DATABASE_URL",
+   "expect": [
+    "rg -l \"DATABASE_URL\""
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "how much free disk space is left",
+   "expect": [
+    "df -h"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "archive the data folder with today's date",
+   "expect": [
+    "tar -czvf backup-2026-10-27.tar.gz ./data"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "unpack the dataset",
+   "expect": [
+    "tar -xzvf dataset.tar.gz -C ~/data"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "upload the release tarball to the server",
+   "expect": [
+    "scp ./dist/app.tar.gz deploy@10.0.0.12:/opt/app/"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "look up the ip of the api domain",
+   "expect": [
+    "dig +short api.acme.io"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "copy my ssh key to the server",
+   "expect": [
+    "ssh-copy-id deploy@10.0.0.12"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "check the tls certificate the server sends",
+   "expect": [
+    "openssl s_client -connect api.acme.io:443 -servername api.acme.io"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "open port 443 in the firewall",
+   "expect": [
+    "sudo ufw allow 443/tcp"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "stop the uvicorn server",
+   "expect": [
+    "pkill -f uvicorn"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "restart nginx",
+   "expect": [
+    "sudo systemctl restart nginx"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "edit my scheduled jobs",
+   "expect": [
+    "crontab -e"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "how much ram is free",
+   "expect": [
+    "free -h"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "restore the database dump into the test db",
+   "expect": [
+    "pg_restore -d app_test app-2026-10-27.dump"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "list all databases on the mysql server",
+   "expect": [
+    "mysql -u root -p -e \"SHOW DATABASES\""
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "remove only the worker vm",
+   "expect": [
+    "terraform destroy -target=aws_instance.worker"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "list the backups bucket",
+   "expect": [
+    "aws s3 ls s3://acme-backups/"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "set the default gcp project",
+   "expect": [
+    "gcloud config set project acme-prod"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "kill all node processes on windows",
+   "expect": [
+    "Stop-Process -Name node -Force"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "tail the app log in powershell",
+   "expect": [
+    "Get-Content .\\app.log -Tail 50 -Wait"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "attach to my tmux session",
+   "expect": [
+    "tmux attach -t work"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "print each PATH entry on its own line",
+   "expect": [
+    "echo $PATH | tr ':' '\\n'"
+   ],
+   "kind": "paraphrase"
+  },
+  {
+   "q": "current time in utc iso format",
+   "expect": [
+    "date -u +%Y-%m-%dT%H:%M:%SZ"
+   ],
+   "kind": "paraphrase"
+  }
+ ]
+}

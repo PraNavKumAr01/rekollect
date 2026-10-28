@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rekollect"
+version = "0.1.0"
+description = "Semantic search for your shell history. Find that command by describing it."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Pranav Kumar Nair" }]
+keywords = ["shell", "history", "zsh", "bash", "fish", "powershell", "semantic-search", "embeddings", "cli", "onnx"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Shells",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "numpy>=1.24",
+  "rich>=13.7",
+  "tokenizers>=0.15",
+  "onnxruntime>=1.17",
+  "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "onnx>=1.16"]
+
+[project.scripts]
+rekollect = "rekollect.cli:main"
+rk = "rekollect.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/PraNavKumAr01/rekollect"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rekollect"]
