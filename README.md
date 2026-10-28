@@ -10,9 +10,6 @@ Semantic search for your shell history. Runs fully offline on a tiny embedding m
 
 <img src="docs/demo.gif" width="900" alt="rekollect in a real zsh session: search by meaning, the Ctrl+G picker, filling a template and finding a whole release workflow">
 
-<!-- Full 5-minute walkthrough: in GitHub's web editor, drag docs/rekollect-demo.mp4 onto this line.
-     GitHub uploads it and pastes a https://github.com/user-attachments/assets/… link that plays inline. -->
-
 </div>
 
 ```text
@@ -26,6 +23,10 @@ $ rk "shrink that video"
 You remember *what* you did, not the exact flags. `Ctrl+R` only matches exact substrings, so
 "undo last commit but keep changes" never finds `git reset --soft HEAD~1`. rekollect does. It also
 turns past commands into reusable templates, and past sessions into workflows you can replay.
+
+## Full Demo
+
+https://github.com/user-attachments/assets/190831fc-44d6-4b93-a23f-40c45d605816
 
 ## Features
 
