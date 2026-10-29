@@ -11,6 +11,8 @@ We add user keybindings (user keybindings beat the defaults):
     sequences the same way. The PowerShell hook binds F12,r to the picker.
   * every other shell: send the raw control byte (Ctrl+G = 0x07), which is what
     the shell would have received without VS Code in the way.
+  * macOS: VS Code puts terminal commands on Cmd (Go to Recent Directory is Cmd+G),
+    so Cmd+<key> is bound the same way as Ctrl+<key>; both open the picker.
 
 keybindings.json is JSONC (comments, trailing commas), so we never re-serialise
 it: we splice our lines in as text and verify the result still parses.
@@ -57,22 +59,36 @@ def in_vscode_terminal() -> bool:
     return os.environ.get("TERM_PROGRAM") == "vscode"
 
 
+IS_MAC = sys.platform == "darwin"
+
+
 def vscode_key(key: str) -> tuple[str, str]:
     """'^G' → ('ctrl+g', '\\x07')."""
     ch = key[1].lower()
     return f"ctrl+{ch}", chr(ord(ch) & 0x1F)
 
 
-def block(key: str, indent: str = "  ") -> str:
-    vk, seq = vscode_key(key)
-    lines = [MARK_BEGIN]
-    for cmd in _CONFLICTS.get(vk, []):
-        lines.append(json.dumps({"key": vk, "command": "-" + cmd}) + ",")
-    lines.append(json.dumps({"key": vk, "command": "workbench.action.terminal.sendSequence",
-                             "args": {"text": PS_ALT_SEQUENCE},
-                             "when": "terminalFocus && terminalShellType == 'pwsh'"}) + ",")
-    lines.append(json.dumps({"key": vk, "command": "workbench.action.terminal.sendSequence",
-                             "args": {"text": seq}, "when": "terminalFocus && terminalShellType != 'pwsh'"}))
+def vscode_keys(key: str, mac: bool = IS_MAC) -> list[str]:
+    """Every VS Code key that should open the picker: ctrl+g, plus cmd+g on macOS."""
+    vk, _ = vscode_key(key)
+    return [vk, "cmd+" + vk.split("+", 1)[1]] if mac else [vk]
+
+
+def key_label(key: str, mac: bool = IS_MAC) -> str:
+    return " / ".join(vscode_keys(key, mac))
+
+
+def block(key: str, indent: str = "  ", mac: bool = IS_MAC) -> str:
+    _, seq = vscode_key(key)
+    rules = []
+    for vk in vscode_keys(key, mac):
+        conflicts = _CONFLICTS.get("ctrl+" + vk.split("+", 1)[1], [])
+        rules += [{"key": vk, "command": "-" + cmd} for cmd in conflicts]
+        rules.append({"key": vk, "command": "workbench.action.terminal.sendSequence",
+                      "args": {"text": PS_ALT_SEQUENCE}, "when": "terminalFocus && terminalShellType == 'pwsh'"})
+        rules.append({"key": vk, "command": "workbench.action.terminal.sendSequence",
+                      "args": {"text": seq}, "when": "terminalFocus && terminalShellType != 'pwsh'"})
+    lines = [MARK_BEGIN] + [json.dumps(r) + ("," if i < len(rules) - 1 else "") for i, r in enumerate(rules)]
     lines.append(MARK_END)
     return "\n".join(indent + ln for ln in lines)
 
@@ -176,7 +192,7 @@ def is_current(path: Path) -> bool:
     if not path.exists():
         return False
     text = path.read_text(encoding="utf-8-sig", errors="ignore")
-    return MARK_BEGIN in text and "\\u001b[24~r" in text
+    return MARK_BEGIN in text and "\\u001b[24~r" in text and (not IS_MAC or '"cmd+' in text)
 
 
 def has_block(path: Path) -> bool:

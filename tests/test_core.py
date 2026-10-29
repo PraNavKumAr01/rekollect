@@ -1,3 +1,4 @@
+import zlib
 import os
 import json
 import struct
@@ -108,7 +109,7 @@ class FakeEmb:
         out = np.zeros((len(texts), self.dim), np.float32)
         for i, t in enumerate(texts):
             for tok in tokens(t):
-                out[i, hash(tok) % self.dim] += 1
+                out[i, zlib.crc32(tok.encode()) % self.dim] += 1
         n = np.linalg.norm(out, axis=1, keepdims=True)
         return out / np.maximum(n, 1e-9)
 
@@ -667,3 +668,12 @@ def test_tune_improves_replayed_choices():
     before = score_replays(replays, w, 0.3)["mrr"]
     res = tune(replays, w, 0.3)
     assert res["accepted"] and res["after"]["mrr"] > before and res["weights"]["frequency"] > 0.08
+
+
+def test_vscode_block_adds_cmd_key_on_mac():
+    from rekollect import vscode
+    mac = vscode.parse_jsonc("[\n" + vscode.block("^G", mac=True) + "\n]")
+    assert {r["key"] for r in mac} == {"ctrl+g", "cmd+g"}
+    assert {"key": "cmd+g", "command": "-workbench.action.terminal.goToRecentDirectory"} in mac
+    other = vscode.parse_jsonc("[\n" + vscode.block("^G", mac=False) + "\n]")
+    assert {r["key"] for r in other} == {"ctrl+g"}

@@ -368,7 +368,7 @@ def _offer_vscode(con, cfg: C.Config, assume_yes: bool = False) -> None:
     if not editors:
         return
     key = cfg.get_path("ui.key", "^G")
-    vk, _ = vscode.vscode_key(key)
+    vk = vscode.key_label(key)
     names = ", ".join(n for n, _ in editors)
     if assume_yes or (sys.stdin.isatty() and Confirm.ask(
             f"  {names} grabs [accent]{vk}[/] in its terminal. Add a keybinding so it reaches the picker?",
@@ -589,7 +589,7 @@ def cmd_vscode(argv, cfg) -> int:
             con.print(f"  {'[ok]✓[/] removed from' if done else '[faint]·[/] nothing in'} {name} [faint]({path})[/]")
         return 0
     key = cfg.get_path("ui.key", "^G")
-    vk, _ = vscode.vscode_key(key)
+    vk = vscode.key_label(key)
     rc = 0
     for name, path in editors:
         try:
@@ -672,7 +672,7 @@ def cmd_doctor(argv, cfg) -> int:
             con.print(f"  [ok]✓[/] {name:<11} picker key passes through to the terminal")
         elif vscode.has_block(path):
             con.print(f"  [warn]![/] {name:<11} keybinding is from an older version; run [accent]rk vscode[/] "
-                      "[faint](fixes PowerShell)[/]")
+                      "[faint](adds PowerShell and macOS Cmd keys)[/]")
         else:
             con.print(f"  {ok(False)} {name:<11} [faint]may grab the picker key in its terminal; run[/] "
                       "[accent]rk vscode[/]")

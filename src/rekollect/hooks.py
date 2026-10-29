@@ -61,7 +61,13 @@ __rk_widget() {
   return $ret
 }
 zle -N __rk_widget
-bindkey '@KEY@' __rk_widget
+# Bind in every keymap (emacs and vi users alike), and once more at the first prompt:
+# oh-my-zsh, prezto and zsh-vi-mode can rebuild keymaps after this file has run.
+__rk_bind() { local m; for m in emacs viins vicmd; do bindkey -M $m '@KEY@' __rk_widget; done }
+__rk_bind
+__rk_bind_once() { __rk_bind; add-zsh-hook -d precmd __rk_bind_once }
+add-zsh-hook precmd __rk_bind_once
+typeset -ga zvm_after_init_commands; zvm_after_init_commands+=(__rk_bind)
 
 rk() {
   if (( $# )) && [[ " @SUBS@ " == *" $1 "* || " $* " == *" -"* ]]; then command rekollect "$@"; return; fi
